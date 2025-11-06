@@ -20,6 +20,11 @@ python312Packages.buildPythonPackage {
     wheel
   ];
 
+  propagatedBuildInputs = with python312Packages; [
+    packaging
+    pyyaml
+  ];
+
   doCheck = false;
 
   pythonImportsCheck = [ "dagster_shared" ];

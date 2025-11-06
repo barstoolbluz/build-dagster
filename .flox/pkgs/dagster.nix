@@ -48,6 +48,7 @@ python312Packages.buildPythonPackage {
     docstring-parser
     rich
     filelock
+    pydantic
   ] ++ [
     # Internal packages
     dagster-pipes

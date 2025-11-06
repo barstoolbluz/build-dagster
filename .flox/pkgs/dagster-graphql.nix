@@ -26,6 +26,7 @@ python312Packages.buildPythonPackage {
     graphene
     gql
     requests
+    requests-toolbelt
     starlette
   ];
 
