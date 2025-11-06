@@ -1,28 +1,25 @@
 # Complete Dagster build - all packages in a single closure
 { python312Packages
 , fetchFromGitHub
-, runCommand
 , buildEnv
 }:
 
 let
-  # Fetch source from upstream GitHub
+  # Fetch source from upstream GitHub (stable release 1.12.0)
   dagster-src = fetchFromGitHub {
     owner = "dagster-io";
     repo = "dagster";
-    rev = "master";
-    hash = "sha256-hR3QRm5ihtTcAO6zHSVKGNUiL+MEflC4Bm1YqQ+lvf4=";
+    rev = "1.12.0";
+    hash = "sha256-MBI7vTTIrFk63hd6u6BL8HrOW5e1b1XGBCkmolSkLro=";
   };
 
   # Build dagster-shared (internal utilities)
   dagster-shared = python312Packages.buildPythonPackage {
     pname = "dagster-shared";
-    version = "1.9.11";
+    version = "1.12.0";
 
-    src = runCommand "dagster-shared-source" {} ''
-      cp -r ${dagster-src}/python_modules/libraries/dagster-shared $out
-      chmod -R u+w $out
-    '';
+    src = dagster-src;
+    sourceRoot = "source/python_modules/libraries/dagster-shared";
 
     format = "setuptools";
 
@@ -34,6 +31,10 @@ let
     propagatedBuildInputs = with python312Packages; [
       packaging
       pyyaml
+      platformdirs
+      pydantic
+      typing-extensions
+      tomlkit
     ];
 
     doCheck = false;
@@ -48,12 +49,10 @@ let
   # Build dagster-pipes (pipeline communication)
   dagster-pipes = python312Packages.buildPythonPackage {
     pname = "dagster-pipes";
-    version = "1.9.11";
+    version = "1.12.0";
 
-    src = runCommand "dagster-pipes-source" {} ''
-      cp -r ${dagster-src}/python_modules/dagster-pipes $out
-      chmod -R u+w $out
-    '';
+    src = dagster-src;
+    sourceRoot = "source/python_modules/dagster-pipes";
 
     format = "setuptools";
 
@@ -76,12 +75,10 @@ let
   # Build main dagster package
   dagster = python312Packages.buildPythonPackage {
     pname = "dagster";
-    version = "1.9.11";
+    version = "1.12.0";
 
-    src = runCommand "dagster-source" {} ''
-      cp -r ${dagster-src}/python_modules/dagster $out
-      chmod -R u+w $out
-    '';
+    src = dagster-src;
+    sourceRoot = "source/python_modules/dagster";
 
     format = "setuptools";
 
@@ -112,11 +109,14 @@ let
       sqlalchemy
       toposort
       watchdog
-      psutil
       docstring-parser
       rich
       filelock
       pydantic
+      # Python 3.12+ specific
+      universal-pathlib
+      # Expression parsing
+      antlr4-python3-runtime
     ] ++ [
       # Internal packages
       dagster-pipes
@@ -135,12 +135,10 @@ let
   # Build dagster-graphql (GraphQL API)
   dagster-graphql = python312Packages.buildPythonPackage {
     pname = "dagster-graphql";
-    version = "1.9.11";
+    version = "1.12.0";
 
-    src = runCommand "dagster-graphql-source" {} ''
-      cp -r ${dagster-src}/python_modules/dagster-graphql $out
-      chmod -R u+w $out
-    '';
+    src = dagster-src;
+    sourceRoot = "source/python_modules/dagster-graphql";
 
     format = "setuptools";
 
@@ -170,12 +168,10 @@ let
   # Build dagster-webserver (Web UI)
   dagster-webserver = python312Packages.buildPythonPackage {
     pname = "dagster-webserver";
-    version = "1.9.11";
+    version = "1.12.0";
 
-    src = runCommand "dagster-webserver-source" {} ''
-      cp -r ${dagster-src}/python_modules/dagster-webserver $out
-      chmod -R u+w $out
-    '';
+    src = dagster-src;
+    sourceRoot = "source/python_modules/dagster-webserver";
 
     format = "setuptools";
 
@@ -204,7 +200,7 @@ let
 in
 # Combine all packages into a single closure
 buildEnv {
-  name = "dagster-complete-1.9.11";
+  name = "dagster-complete-1.12.0";
 
   paths = [
     dagster-shared
