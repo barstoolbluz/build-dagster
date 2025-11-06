@@ -1,13 +1,17 @@
 # Build dagster-shared (internal package)
 { python312Packages
 , dagster-src
+, runCommand
 }:
 
 python312Packages.buildPythonPackage {
   pname = "dagster-shared";
   version = "1.9.11";  # Update this when tracking new versions
 
-  src = "${dagster-src}/python_modules/dagster-shared";
+  src = runCommand "dagster-shared-source" {} ''
+    cp -r ${dagster-src}/python_modules/libraries/dagster-shared $out
+    chmod -R u+w $out
+  '';
 
   format = "setuptools";
 

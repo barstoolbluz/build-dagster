@@ -2,13 +2,17 @@
 { python312Packages
 , dagster-src
 , dagster-shared
+, runCommand
 }:
 
 python312Packages.buildPythonPackage {
   pname = "dagster-pipes";
   version = "1.9.11";  # Update this when tracking new versions
 
-  src = "${dagster-src}/python_modules/dagster-pipes";
+  src = runCommand "dagster-pipes-source" {} ''
+    cp -r ${dagster-src}/python_modules/dagster-pipes $out
+    chmod -R u+w $out
+  '';
 
   format = "setuptools";
 
