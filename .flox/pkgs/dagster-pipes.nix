@@ -7,7 +7,7 @@
 
 python312Packages.buildPythonPackage {
   pname = "dagster-pipes";
-  version = "1.9.11";  # Update this when tracking new versions
+  version = "1.12.0";
 
   src = runCommand "dagster-pipes-source" {} ''
     cp -r ${dagster-src}/python_modules/dagster-pipes $out

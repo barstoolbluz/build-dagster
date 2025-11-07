@@ -7,7 +7,7 @@
 
 python312Packages.buildPythonPackage {
   pname = "dagster-graphql";
-  version = "1.9.11";  # Update this when tracking new versions
+  version = "1.12.0";
 
   src = runCommand "dagster-graphql-source" {} ''
     cp -r ${dagster-src}/python_modules/dagster-graphql $out

@@ -6,7 +6,7 @@
 
 python312Packages.buildPythonPackage {
   pname = "dagster-shared";
-  version = "1.9.11";  # Update this when tracking new versions
+  version = "1.12.0";
 
   src = runCommand "dagster-shared-source" {} ''
     cp -r ${dagster-src}/python_modules/libraries/dagster-shared $out
