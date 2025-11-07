@@ -1,8 +1,10 @@
-# Complete Dagster build - all packages in a single closure
-{ python312Packages
+# Complete Dagster build - all packages in a single closure with proper Python environment
+{ python312
+, python312Packages
 , fetchFromGitHub
 , fetchPypi
-, buildEnv
+, symlinkJoin
+, makeWrapper
 }:
 
 let
@@ -194,8 +196,7 @@ let
     ];
 
     doCheck = false;
-    # Skip import check because dependencies aren't available at build time in buildEnv
-    pythonImportsCheck = [];
+    pythonImportsCheck = [ "dagster_webserver" ];
 
     meta = {
       description = "Dagster web server and UI";
@@ -203,23 +204,33 @@ let
     };
   };
 
-in
-# Combine all packages into a single closure
-buildEnv {
-  name = "dagster-complete-1.12.0";
-
-  paths = [
+  # Create a proper Python environment with all packages
+  dagsterPythonEnv = python312.withPackages (ps: [
     dagster-shared
     dagster-pipes
     dagster
     dagster-graphql
     dagster-webserver
-  ];
+  ]);
 
-  pathsToLink = [
-    "/bin"
-    "/lib"
-  ];
+in
+# Combine Python environment and binaries into a single closure
+symlinkJoin {
+  name = "dagster-complete-1.12.0";
+
+  paths = [ dagsterPythonEnv ];
+
+  nativeBuildInputs = [ makeWrapper ];
+
+  postBuild = ''
+    # Ensure all Dagster CLIs use the proper Python environment
+    for bin in $out/bin/dagster*; do
+      if [ -f "$bin" ]; then
+        wrapProgram "$bin" \
+          --prefix PYTHONPATH : "${dagsterPythonEnv}/${python312.sitePackages}"
+      fi
+    done
+  '';
 
   meta = {
     description = "Complete Dagster platform with all components";
@@ -234,6 +245,8 @@ buildEnv {
 
       Provides all CLIs: dagster, dagster-daemon, dagster-graphql,
       dagster-webserver, dagster-webserver-debug
+
+      Built as a proper Python environment where all packages can import each other.
     '';
   };
 }
