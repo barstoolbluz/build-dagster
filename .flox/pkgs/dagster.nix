@@ -204,6 +204,35 @@ let
     };
   };
 
+  # Build dagster-postgres (PostgreSQL integration)
+  dagster-postgres = python312Packages.buildPythonPackage {
+    pname = "dagster-postgres";
+    version = "1.12.0";
+
+    src = dagster-src;
+    sourceRoot = "source/python_modules/libraries/dagster-postgres";
+
+    format = "setuptools";
+
+    nativeBuildInputs = with python312Packages; [
+      setuptools
+      wheel
+    ];
+
+    propagatedBuildInputs = with python312Packages; [
+      dagster
+      psycopg2
+    ];
+
+    doCheck = false;
+    pythonImportsCheck = [ "dagster_postgres" ];
+
+    meta = {
+      description = "Dagster PostgreSQL storage integration";
+      homepage = "https://dagster.io";
+    };
+  };
+
   # Create a proper Python environment with all packages
   dagsterPythonEnv = python312.withPackages (ps: [
     dagster-shared
@@ -211,6 +240,7 @@ let
     dagster
     dagster-graphql
     dagster-webserver
+    dagster-postgres
   ]);
 
 in
@@ -356,12 +386,29 @@ if [ "$DAGSTER_STORAGE_TYPE" = "postgres" ]; then
 fi
 echo "  Artifacts: ''${DAGSTER_STORAGE_DIR}"
 echo ""
+
+# PostgreSQL detection and guidance
+if command -v postgres >/dev/null 2>&1; then
+    echo "PostgreSQL: Available via composition"
+    if [ "$DAGSTER_STORAGE_TYPE" = "postgres" ]; then
+        echo "  Status: CONFIGURED (Dagster will use PostgreSQL)"
+        echo "  ⚠️  Start postgres first: flox services start postgres"
+    else
+        echo "  Status: Available but not configured (using SQLite)"
+        echo "  To use: DAGSTER_STORAGE_TYPE=postgres flox activate"
+    fi
+    echo ""
+fi
+
 echo "Commands:"
 echo "  flox activate -s           Start Dagster (webserver + daemon)"
 echo "  dagster --version          Show Dagster version"
 echo "  dagster instance info      Show instance details"
 echo "  dagster-info               Show configuration"
 echo "  flox services status       Check service status"
+if command -v postgres >/dev/null 2>&1 && [ "$DAGSTER_STORAGE_TYPE" = "postgres" ]; then
+    echo "  dagster-with-postgres      Start Dagster with PostgreSQL"
+fi
 echo ""
 WELCOME_SCRIPT
 
@@ -411,10 +458,70 @@ echo "  flox services logs dagster-webserver View webserver logs"
 echo "  flox services logs dagster-daemon    View daemon logs"
 INFO_SCRIPT
 
+    # dagster-with-postgres: Start Dagster with PostgreSQL backend
+    cat > $out/bin/dagster-with-postgres << 'POSTGRES_SCRIPT'
+#!/usr/bin/env bash
+# dagster-with-postgres - Start Dagster with PostgreSQL backend
+
+# Ensure we're in a flox environment
+if [ -z "$FLOX_ENV" ]; then
+    echo "❌ This script must be run inside a flox environment"
+    echo "   Try: flox activate"
+    exit 1
+fi
+
+# Check if postgres command exists
+if ! command -v postgres >/dev/null 2>&1; then
+    echo "❌ PostgreSQL not found"
+    echo "   This environment needs to include postgres-headless"
+    exit 1
+fi
+
+# Set postgres storage type
+export DAGSTER_STORAGE_TYPE=postgres
+export PGDATABASE="''${PGDATABASE:-dagster}"
+
+# Auto-generate connection URL
+export DAGSTER_POSTGRES_URL="postgresql://''${PGUSER}:''${PGPASSWORD}@''${PGHOSTADDR:-127.0.0.1}:''${PGPORT:-15432}/''${PGDATABASE}"
+
+echo "Starting PostgreSQL..."
+flox services start postgres
+
+# Wait for postgres to be ready
+echo "Waiting for PostgreSQL to be ready..."
+for i in {1..10}; do
+    if pg_isready -h "''${PGHOSTADDR:-127.0.0.1}" -p "''${PGPORT:-15432}" >/dev/null 2>&1; then
+        echo "✅ PostgreSQL is ready"
+        break
+    fi
+    sleep 1
+done
+
+echo "Starting Dagster services..."
+flox services start dagster-webserver
+flox services start dagster-daemon
+
+sleep 2
+
+echo ""
+echo "✅ Dagster with PostgreSQL is running"
+echo ""
+echo "Web UI: http://''${DAGSTER_HOST}:''${DAGSTER_PORT}"
+echo "PostgreSQL: ''${PGHOSTADDR}:''${PGPORT}/''${PGDATABASE}"
+echo ""
+echo "Commands:"
+echo "  flox services status                    Check all services"
+echo "  flox services logs dagster-webserver    View webserver logs"
+echo "  flox services logs postgres             View postgres logs"
+echo "  dagster-info                            Show Dagster config"
+echo "  postgres-info                           Show PostgreSQL config"
+POSTGRES_SCRIPT
+
     # Make all helper scripts executable
     chmod +x $out/bin/dagster-init-config
     chmod +x $out/bin/dagster-welcome
     chmod +x $out/bin/dagster-info
+    chmod +x $out/bin/dagster-with-postgres
   '';
 
   meta = {
