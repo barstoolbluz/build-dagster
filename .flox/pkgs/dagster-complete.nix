@@ -217,6 +217,7 @@ in
 # Combine Python environment and binaries into a single closure
 symlinkJoin {
   name = "dagster-complete-1.12.0";
+  version = "1.12.0";
 
   paths = [ dagsterPythonEnv ];
 
