@@ -3,6 +3,14 @@
   "manifest": {
     "version": 1,
     "install": {
+      "gcc": {
+        "pkg-path": "gcc"
+      },
+      "gcc-unwrapped": {
+        "pkg-path": "gcc-unwrapped",
+        "pkg-group": "libraries",
+        "priority": 6
+      },
       "python312": {
         "pkg-path": "python312"
       }
@@ -12,6 +20,270 @@
     "options": {}
   },
   "packages": [
+    {
+      "attr_path": "gcc-unwrapped",
+      "broken": false,
+      "derivation": "/nix/store/qqqwawg3w8m1vzqssh35xcvlpjlzy7iy-gcc-14.3.0.drv",
+      "description": "GNU Compiler Collection, version 14.3.0",
+      "install_id": "gcc-unwrapped",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b3d51a0365f6695e7dd5cdf3e180604530ed33b4",
+      "name": "gcc-14.3.0",
+      "pname": "gcc-unwrapped",
+      "rev": "b3d51a0365f6695e7dd5cdf3e180604530ed33b4",
+      "rev_count": 888552,
+      "rev_date": "2025-11-02T19:18:41Z",
+      "scrape_date": "2025-11-04T00:35:19.045687Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "14.3.0",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/rcla6i1jlikcg5gdikmic39z0bvfr33c-gcc-14.3.0-info",
+        "lib": "/nix/store/0hmh0bmpjbzya6lqi3ziy2ymj9696qln-gcc-14.3.0-lib",
+        "man": "/nix/store/j1biv3nq2mlgysgli6pi289frbbpn07y-gcc-14.3.0-man",
+        "out": "/nix/store/x0rg5sdxc63l5knb8pmyqnb75njbl533-gcc-14.3.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "libraries",
+      "priority": 6
+    },
+    {
+      "attr_path": "gcc-unwrapped",
+      "broken": false,
+      "derivation": "/nix/store/9qnqq1jzddqnb38akfjhl3kq4dqifmkq-gcc-14.3.0.drv",
+      "description": "GNU Compiler Collection, version 14.3.0",
+      "install_id": "gcc-unwrapped",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b3d51a0365f6695e7dd5cdf3e180604530ed33b4",
+      "name": "gcc-14.3.0",
+      "pname": "gcc-unwrapped",
+      "rev": "b3d51a0365f6695e7dd5cdf3e180604530ed33b4",
+      "rev_count": 888552,
+      "rev_date": "2025-11-02T19:18:41Z",
+      "scrape_date": "2025-11-05T16:28:58.705336Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "14.3.0",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "checksum": "/nix/store/mfi7z57s4lwfjzifxs7jny0qm2h5f3vx-gcc-14.3.0-checksum",
+        "info": "/nix/store/8vm32slp7b8v88n2xjzwp84ljm5064g6-gcc-14.3.0-info",
+        "lib": "/nix/store/zmjqwzhgl9hwr8xnk8raj8d50lzkql66-gcc-14.3.0-lib",
+        "libgcc": "/nix/store/f8w1i7yisixb9hivzbk0l4ixmf67fjqr-gcc-14.3.0-libgcc",
+        "man": "/nix/store/81y9ib5ydnnpqhyg70078zwcxzq6zpir-gcc-14.3.0-man",
+        "out": "/nix/store/z6c8n7gxx2i57zvmri96j4zgxb8v4v1f-gcc-14.3.0"
+      },
+      "system": "aarch64-linux",
+      "group": "libraries",
+      "priority": 6
+    },
+    {
+      "attr_path": "gcc-unwrapped",
+      "broken": false,
+      "derivation": "/nix/store/52wh4ls0b2djvsz57gl77rasphmgqh9m-gcc-14.3.0.drv",
+      "description": "GNU Compiler Collection, version 14.3.0",
+      "install_id": "gcc-unwrapped",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b3d51a0365f6695e7dd5cdf3e180604530ed33b4",
+      "name": "gcc-14.3.0",
+      "pname": "gcc-unwrapped",
+      "rev": "b3d51a0365f6695e7dd5cdf3e180604530ed33b4",
+      "rev_count": 888552,
+      "rev_date": "2025-11-02T19:18:41Z",
+      "scrape_date": "2025-11-05T16:54:58.075094Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "14.3.0",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/0qni6jhz6xshdxcjzfdzww0ccaiyb0aj-gcc-14.3.0-info",
+        "lib": "/nix/store/ih2i0vfgqlsz7mqvxzm40xy08kcnf1xk-gcc-14.3.0-lib",
+        "man": "/nix/store/6syl8xr7j8yc340i524gapgznvjmac2a-gcc-14.3.0-man",
+        "out": "/nix/store/f8avfw6i9acdwcl8kcijm7g4z3s00ysz-gcc-14.3.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "libraries",
+      "priority": 6
+    },
+    {
+      "attr_path": "gcc-unwrapped",
+      "broken": false,
+      "derivation": "/nix/store/csn2adchl5yyh8kiy4mcaf3bb490zh7n-gcc-14.3.0.drv",
+      "description": "GNU Compiler Collection, version 14.3.0",
+      "install_id": "gcc-unwrapped",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b3d51a0365f6695e7dd5cdf3e180604530ed33b4",
+      "name": "gcc-14.3.0",
+      "pname": "gcc-unwrapped",
+      "rev": "b3d51a0365f6695e7dd5cdf3e180604530ed33b4",
+      "rev_count": 888552,
+      "rev_date": "2025-11-02T19:18:41Z",
+      "scrape_date": "2025-11-05T17:20:48.130476Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "14.3.0",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "checksum": "/nix/store/zjyl1cdjz9jkjzqf95jlxffkkx58dwls-gcc-14.3.0-checksum",
+        "info": "/nix/store/d03p34500svz1wlrwpzwr4930xzd0g1a-gcc-14.3.0-info",
+        "lib": "/nix/store/z7a34j3xnp66rpddayyxrxwsahxccbip-gcc-14.3.0-lib",
+        "libgcc": "/nix/store/mnd897flngivhxnw8sxznhrcwwc9vyk3-gcc-14.3.0-libgcc",
+        "man": "/nix/store/j7mhlc3lwv6bz199iclik4fmgh4f8g24-gcc-14.3.0-man",
+        "out": "/nix/store/ffrg0560kj0066s4k9pznjand907nlnz-gcc-14.3.0"
+      },
+      "system": "x86_64-linux",
+      "group": "libraries",
+      "priority": 6
+    },
+    {
+      "attr_path": "gcc",
+      "broken": false,
+      "derivation": "/nix/store/hj4a7ilmb8mc4zxqvnpsxm6yn8i841s0-gcc-wrapper-14.3.0.drv",
+      "description": "GNU Compiler Collection, version 14.3.0 (wrapper script)",
+      "install_id": "gcc",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b3d51a0365f6695e7dd5cdf3e180604530ed33b4",
+      "name": "gcc-wrapper-14.3.0",
+      "pname": "gcc",
+      "rev": "b3d51a0365f6695e7dd5cdf3e180604530ed33b4",
+      "rev_count": 888552,
+      "rev_date": "2025-11-02T19:18:41Z",
+      "scrape_date": "2025-11-04T00:35:19.044546Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "14.3.0",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/hwvw53vn8ngsyrzfw4lzbyb8vbwrs6iz-gcc-wrapper-14.3.0-info",
+        "man": "/nix/store/6clqcy6xlc3dr2ls0rr8rz2439qdyj4i-gcc-wrapper-14.3.0-man",
+        "out": "/nix/store/876hgrm2amxraw5rliyn3vhlamz7bhjq-gcc-wrapper-14.3.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gcc",
+      "broken": false,
+      "derivation": "/nix/store/n7hns0g864qi4mk0wjp6kmpv2lx2lw3p-gcc-wrapper-14.3.0.drv",
+      "description": "GNU Compiler Collection, version 14.3.0 (wrapper script)",
+      "install_id": "gcc",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b3d51a0365f6695e7dd5cdf3e180604530ed33b4",
+      "name": "gcc-wrapper-14.3.0",
+      "pname": "gcc",
+      "rev": "b3d51a0365f6695e7dd5cdf3e180604530ed33b4",
+      "rev_count": 888552,
+      "rev_date": "2025-11-02T19:18:41Z",
+      "scrape_date": "2025-11-05T16:28:58.704012Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "14.3.0",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/b2xcihrj4l77y1810yii7gq9xi65l03v-gcc-wrapper-14.3.0-info",
+        "man": "/nix/store/daraln4hlx3yzw83qgi59wknvx4lb665-gcc-wrapper-14.3.0-man",
+        "out": "/nix/store/hl19vrjrc54fvmwzp6391252j3ygnhja-gcc-wrapper-14.3.0"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gcc",
+      "broken": false,
+      "derivation": "/nix/store/0lbkdld5bicl8jfwkki61pxgcbbwhsn8-gcc-wrapper-14.3.0.drv",
+      "description": "GNU Compiler Collection, version 14.3.0 (wrapper script)",
+      "install_id": "gcc",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b3d51a0365f6695e7dd5cdf3e180604530ed33b4",
+      "name": "gcc-wrapper-14.3.0",
+      "pname": "gcc",
+      "rev": "b3d51a0365f6695e7dd5cdf3e180604530ed33b4",
+      "rev_count": 888552,
+      "rev_date": "2025-11-02T19:18:41Z",
+      "scrape_date": "2025-11-05T16:54:58.074530Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "14.3.0",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/fl044fagdg6659j7fpasva31nv2cll5v-gcc-wrapper-14.3.0-info",
+        "man": "/nix/store/qin0lp6hmvcmw26j4s4m7v2p05l3gsn6-gcc-wrapper-14.3.0-man",
+        "out": "/nix/store/hbi4hr9gjj7165bqyngb50h3aci4nqbp-gcc-wrapper-14.3.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gcc",
+      "broken": false,
+      "derivation": "/nix/store/hfx466r2lhwvbbjj9my4qkx09g0z9g4h-gcc-wrapper-14.3.0.drv",
+      "description": "GNU Compiler Collection, version 14.3.0 (wrapper script)",
+      "install_id": "gcc",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b3d51a0365f6695e7dd5cdf3e180604530ed33b4",
+      "name": "gcc-wrapper-14.3.0",
+      "pname": "gcc",
+      "rev": "b3d51a0365f6695e7dd5cdf3e180604530ed33b4",
+      "rev_count": 888552,
+      "rev_date": "2025-11-02T19:18:41Z",
+      "scrape_date": "2025-11-05T17:20:48.129058Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "14.3.0",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/z7hszrb8jh32z19n63kz1hy27fb6nkf3-gcc-wrapper-14.3.0-info",
+        "man": "/nix/store/sqf2srspk645q502rv91nl3jyhwrd638-gcc-wrapper-14.3.0-man",
+        "out": "/nix/store/x8mydcgbry214s802nzvy7fdljx404ym-gcc-wrapper-14.3.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
     {
       "attr_path": "python312",
       "broken": false,
