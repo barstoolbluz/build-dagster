@@ -213,38 +213,30 @@ All versions provide these 8 binaries:
 - `dagster-welcome` - Environment welcome message
 - `dagster-info` - Environment information
 
-## Version Management
+## How It Works
 
-When updating to new versions:
+**Single Nix Expression Pattern:**
 
-1. **Update version numbers** in all `.flox/pkgs/*.nix` files:
-   ```nix
-   version = "1.9.11";  # Change to new version
-   ```
+This build uses a **single Nix expression** (`.flox/pkgs/dagster.nix`) that builds all Dagster components in one unified closure:
 
-2. **Update source reference** in `dagster-src.nix`
+1. **Fetches upstream source** from GitHub (dagster-io/dagster)
+2. **Builds internal packages** (dagster-shared, dagster-pipes) from source
+3. **Builds main components** (dagster, dagster-graphql, dagster-webserver, dagster-postgres)
+4. **Combines everything** using `symlinkJoin` into a single output with all binaries
 
-3. **Rebuild and verify**:
-   ```bash
-   flox build
-   ```
+**Key advantage:** Update the version once in `dagster.nix`, and all components stay synchronized.
 
-4. **Publish with version tag**:
-   ```bash
-   git tag v1.9.11
-   git push --tags
-   flox publish
-   ```
+**Flake wrapper:** The `flake.nix` imports this Nix expression and exposes it via standard Nix flake outputs. The flake doesn't need to change when updating versions - only `dagster.nix` does.
 
-## Package Dependencies
+## Package Components
 
-The build order is automatically handled by Nix:
-1. `dagster-src` - Fetches upstream source
-2. `dagster-shared` - Internal utilities
-3. `dagster-pipes` - Depends on dagster-shared
-4. `dagster` - Main package, depends on pipes and shared
-5. `dagster-graphql` - Depends on dagster
-6. `dagster-webserver` - Depends on dagster and graphql
+Built in a single closure with automatic dependency management:
+- **dagster-shared** - Internal utilities (from GitHub)
+- **dagster-pipes** - Pipeline communication (from GitHub)
+- **dagster** - Main orchestration platform (from GitHub)
+- **dagster-graphql** - GraphQL API (from GitHub)
+- **dagster-webserver** - Web UI with pre-built assets (from PyPI)
+- **dagster-postgres** - PostgreSQL integration (from GitHub)
 
 ## Troubleshooting
 
@@ -262,11 +254,14 @@ error: hash mismatch in fixed-output derivation
 ModuleNotFoundError: No module named 'xyz'
 ```
 
-**Solution**: Add the missing package to `propagatedBuildInputs` in the appropriate `.flox/pkgs/*.nix` file.
+**Solution**: Add the missing package to `propagatedBuildInputs` in `.flox/pkgs/dagster.nix` for the affected component.
 
 ### Build Takes Forever
 
-The first build fetches and compiles everything. Subsequent builds are cached. Use `flox build -v` for verbose output to see progress.
+The first build fetches and compiles everything. Subsequent builds are cached.
+
+**For Nix users:** Use `nix build -L` for live build logs
+**For Flox users:** Use `flox build -v` for verbose output
 
 ### Cannot Publish
 
@@ -284,54 +279,46 @@ git push -u origin master
 
 ## Maintenance Workflow
 
-### Weekly Update Routine
+### Updating to a New Dagster Version
+
+See [BUILD_VERSIONS.md](BUILD_VERSIONS.md) for detailed instructions. Quick summary:
 
 ```bash
 # 1. Check for new Dagster releases
 #    https://github.com/dagster-io/dagster/releases
 
-# 2. Update source reference
-vim .flox/pkgs/dagster-src.nix
+# 2. Edit .flox/pkgs/dagster.nix
+#    Update version in 8 locations (rev + all version fields)
+#    Clear both hashes to ""
 
-# 3. Update version numbers in all package files
-vim .flox/pkgs/dagster*.nix
+# 3. Get GitHub source hash
+nix build .#dagster  # or: flox build
+# Copy hash from error, update dagster.nix
 
-# 4. Build and test
-flox build
-flox activate -- python -c "import dagster; print(dagster.__version__)"
+# 4. Get PyPI webserver hash
+nix build .#dagster  # or: flox build
+# Copy hash from error, update dagster.nix
 
-# 5. Commit and publish
-git add .flox/
-git commit -m "Update Dagster to <version>"
+# 5. Build and test
+nix build .#dagster  # or: flox build
+nix run .#dagster -- --version  # or: flox activate -- dagster --version
+
+# 6. Commit and publish
+git add .flox/pkgs/dagster.nix
+git commit -m "Update Dagster to X.Y.Z"
 git push
+
+# For Flox users:
 flox publish
 ```
 
-### Adding More Dagster Packages
+### Adding More Dagster Components
 
-To add packages like `dagster-postgres`, `dagster-docker`, etc.:
+The current build already includes PostgreSQL support (`dagster-postgres`). To add more components like `dagster-docker`, `dagster-aws`, etc., add them to the single `.flox/pkgs/dagster.nix` file:
 
-1. Create `.flox/pkgs/dagster-postgres.nix`:
-   ```nix
-   { python312Packages, dagster-src, dagster }:
-   python312Packages.buildPythonPackage {
-     pname = "dagster-postgres";
-     version = "1.9.11";
-     src = "${dagster-src}/python_modules/libraries/dagster-postgres";
-     propagatedBuildInputs = with python312Packages; [
-       dagster
-       psycopg2
-     ];
-     doCheck = false;
-   }
-   ```
-
-2. Build and publish:
-   ```bash
-   git add .flox/pkgs/dagster-postgres.nix
-   flox build dagster-postgres
-   flox publish
-   ```
+1. Add the new component's build definition inside `dagster.nix` (follow the pattern of existing components)
+2. Add it to `dagsterPythonEnv` packages list
+3. Rebuild with `nix build` or `flox build`
 
 ## Using Published Packages
 
@@ -359,31 +346,48 @@ dagster-webserver.pkg-path = "your-handle/dagster-webserver"
 
 ## Advanced: Customizing Builds
 
-### Override Dependencies
+Since we use a single Nix expression, customizations are made directly in `.flox/pkgs/dagster.nix`.
 
-Create a modified version:
+### Adding Custom Dependencies
+
+Edit the appropriate component's `propagatedBuildInputs` in `dagster.nix`:
 
 ```nix
-# .flox/pkgs/dagster-custom.nix
-{ python312Packages, dagster-src, dagster-shared, dagster-pipes }:
-(python312Packages.buildPythonPackage {
-  # ... same as dagster.nix ...
-}).overrideAttrs (oldAttrs: {
-  # Custom modifications
-  propagatedBuildInputs = oldAttrs.propagatedBuildInputs ++ [
-    python312Packages.my-custom-package
+# Example: Add custom package to main dagster component
+dagster = python312Packages.buildPythonPackage {
+  # ... existing config ...
+  propagatedBuildInputs = with python312Packages; [
+    # ... existing dependencies ...
+    my-custom-package  # Add your package here
   ];
-})
+};
 ```
 
-### Apply Patches
+### Applying Patches
+
+Add patches to specific components:
 
 ```nix
-{ python312Packages, dagster-src, dagster-shared, dagster-pipes }:
-python312Packages.buildPythonPackage {
-  # ... normal definition ...
+# In dagster.nix, for the component you want to patch
+dagster = python312Packages.buildPythonPackage {
+  # ... existing config ...
   patches = [ ./my-dagster.patch ];
-}
+};
+```
+
+### Overriding Python Version
+
+Change the Python version throughout the build by modifying the top of `dagster.nix`:
+
+```nix
+# Replace python312 with python311 or python313
+{ python311        # Change this
+, python311Packages  # And this
+, fetchFromGitHub
+, fetchPypi
+, symlinkJoin
+, makeWrapper
+}:
 ```
 
 ## Resources
