@@ -3,6 +3,10 @@ version = 1
 
 [install]
 python312.pkg-path = "python312"
+gcc.pkg-path = "gcc"
+gcc-unwrapped.pkg-path = "gcc-unwrapped"
+gcc-unwrapped.priority = 6
+gcc-unwrapped.pkg-group = "libraries"
 
 
 [vars]
