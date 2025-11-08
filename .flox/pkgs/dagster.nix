@@ -8,18 +8,18 @@
 }:
 
 let
-  # Fetch source from upstream GitHub (stable release 1.12.0)
+  # Fetch source from upstream GitHub (stable release 1.12.1)
   dagster-src = fetchFromGitHub {
     owner = "dagster-io";
     repo = "dagster";
-    rev = "1.12.0";
-    hash = "sha256-MBI7vTTIrFk63hd6u6BL8HrOW5e1b1XGBCkmolSkLro=";
+    rev = "1.12.1";
+    hash = "sha256-YlPloFELPPgEQk0/dxNYRj0jtG6/qx6NBUr0XUOKl+Q=";
   };
 
   # Build dagster-shared (internal utilities)
   dagster-shared = python312Packages.buildPythonPackage {
     pname = "dagster-shared";
-    version = "1.12.0";
+    version = "1.12.1";
 
     src = dagster-src;
     sourceRoot = "source/python_modules/libraries/dagster-shared";
@@ -52,7 +52,7 @@ let
   # Build dagster-pipes (pipeline communication)
   dagster-pipes = python312Packages.buildPythonPackage {
     pname = "dagster-pipes";
-    version = "1.12.0";
+    version = "1.12.1";
 
     src = dagster-src;
     sourceRoot = "source/python_modules/dagster-pipes";
@@ -78,7 +78,7 @@ let
   # Build main dagster package
   dagster = python312Packages.buildPythonPackage {
     pname = "dagster";
-    version = "1.12.0";
+    version = "1.12.1";
 
     src = dagster-src;
     sourceRoot = "source/python_modules/dagster";
@@ -138,7 +138,7 @@ let
   # Build dagster-graphql (GraphQL API)
   dagster-graphql = python312Packages.buildPythonPackage {
     pname = "dagster-graphql";
-    version = "1.12.0";
+    version = "1.12.1";
 
     src = dagster-src;
     sourceRoot = "source/python_modules/dagster-graphql";
@@ -172,12 +172,12 @@ let
   # Note: Fetched from PyPI instead of GitHub because PyPI wheel includes pre-built webapp assets
   dagster-webserver = python312Packages.buildPythonPackage {
     pname = "dagster-webserver";
-    version = "1.12.0";
+    version = "1.12.1";
 
     src = fetchPypi {
       pname = "dagster_webserver";
-      version = "1.12.0";
-      hash = "sha256-X11EvG1ybjx5OhLjpWsOFv6KMoCBkr1yPbMwLU9ksG4=";
+      version = "1.12.1";
+      hash = "sha256-XcN7ccVPm9y7HWhw+J17/USvkySpggKO5wSeZt5SASU=";
     };
 
     format = "setuptools";
@@ -207,7 +207,7 @@ let
   # Build dagster-postgres (PostgreSQL integration)
   dagster-postgres = python312Packages.buildPythonPackage {
     pname = "dagster-postgres";
-    version = "1.12.0";
+    version = "1.12.1";
 
     src = dagster-src;
     sourceRoot = "source/python_modules/libraries/dagster-postgres";
@@ -246,8 +246,8 @@ let
 in
 # Combine Python environment and binaries into a single closure
 symlinkJoin {
-  name = "dagster-1.12.0";
-  version = "1.12.0";
+  name = "dagster-1.12.1";
+  version = "1.12.1";
 
   paths = [ dagsterPythonEnv ];
 

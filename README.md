@@ -4,30 +4,124 @@ This repository builds Dagster packages from the upstream GitHub repository usin
 
 ## Overview
 
-This uses Flox's **§10 Nix Expression Builds** feature to:
-- Fetch Dagster source directly from `github:dagster-io/dagster`
-- Build all Dagster packages from source
-- Publish to Flox Catalog for reuse
+This provides **two ways** to build and use Dagster:
+
+### Option 1: Nix Flake (for Nix users)
+- Use `nix build`, `nix run`, `nix develop` directly
+- No Flox required
+- Standard Nix flake interface
+- Perfect for integrating into existing Nix workflows
+
+### Option 2: Flox Environment (for Flox users)
+- Use Flox's **§10 Nix Expression Builds** feature
+- Build, publish, and share via Flox Catalog
 - Track upstream updates by changing source reference
+- Composable with other Flox environments
 
 ## Structure
 
 ```
 dagster-build/
+├── flake.nix                   # Nix flake interface
+├── flake.lock                  # Locked flake inputs
+├── default.nix                 # Backward compatibility for non-flake users
+├── BUILD_VERSIONS.md           # Guide for building different versions
 ├── .flox/
 │   ├── env/
 │   │   └── manifest.toml       # Flox environment definition
-│   └── pkgs/                   # Nix expressions for building
-│       ├── dagster-src.nix     # Fetches upstream source
-│       ├── dagster-shared.nix  # Builds internal package
-│       ├── dagster-pipes.nix   # Builds internal package
-│       ├── dagster.nix         # Builds main package
-│       ├── dagster-graphql.nix # Builds GraphQL package
-│       └── dagster-webserver.nix # Builds web server
+│   └── pkgs/
+│       └── dagster.nix         # Single Nix expression building all components
 └── README.md                   # This file
 ```
 
+**Note**: We use a **single Nix expression** (`dagster.nix`) that builds all Dagster components in one closure. This is simpler to maintain and update than separate files per component.
+
 ## Quick Start
+
+### Option A: Using the Nix Flake
+
+For Nix users without Flox:
+
+#### 1. Build the Package
+
+```bash
+cd dagster-build
+
+# Build Dagster (uses Nix cache if available)
+nix build .#dagster
+
+# Or use without experimental features flag (if flakes enabled globally)
+nix build
+```
+
+#### 2. Run Dagster CLIs Directly
+
+```bash
+# Run main dagster CLI
+nix run .#dagster -- --version
+
+# Run dagster webserver
+nix run .#dagster-webserver -- --help
+
+# Run dagster daemon
+nix run .#dagster-daemon -- --help
+
+# Run dagster-graphql
+nix run .#dagster-graphql -- --help
+```
+
+#### 3. Enter Development Shell
+
+```bash
+# Enter shell with Dagster available
+nix develop
+
+# Now you can use all Dagster commands
+dagster --version
+dagster-webserver --version
+python -c "import dagster; print(dagster.__version__)"
+```
+
+#### 4. Use in Your Own Flake
+
+Add to your `flake.nix`:
+
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    dagster.url = "github:yourname/dagster-build";  # Update with your repo
+  };
+
+  outputs = { self, nixpkgs, dagster }:
+    let
+      system = "x86_64-linux";  # or your system
+      pkgs = nixpkgs.legacyPackages.${system};
+    in {
+      devShells.${system}.default = pkgs.mkShell {
+        buildInputs = [
+          dagster.packages.${system}.dagster
+        ];
+      };
+    };
+}
+```
+
+#### 5. Non-Flake Usage
+
+For users without flakes enabled:
+
+```bash
+# Build with legacy nix-build
+nix-build
+
+# Result symlink points to Dagster
+./result/bin/dagster --version
+```
+
+### Option B: Using Flox
+
+For Flox users:
 
 ### 1. Build All Packages
 
@@ -74,53 +168,50 @@ flox publish -o myorg
 # - your-handle/dagster-webserver
 ```
 
-## Tracking Upstream Updates
+## Updating to Different Versions
 
-### Update to Latest Master
+**See [BUILD_VERSIONS.md](BUILD_VERSIONS.md) for comprehensive guide on building different Dagster versions.**
 
-1. **Get latest commit hash from GitHub**:
+### Quick Version Update
+
+The easiest way to build a different version:
+
+1. **Edit `.flox/pkgs/dagster.nix`** - Change version in 8 places:
+   - Line 15: `rev = "X.Y.Z"`
+   - Lines 16, 22, 55, 81, 141, 175, 179, 210, 249, 250: `version = "X.Y.Z"`
+   - Clear both hashes to `""`
+
+2. **Get correct hashes**:
    ```bash
-   # Visit https://github.com/dagster-io/dagster/commits/master
-   # Copy the latest commit hash (e.g., abc123def456)
+   # For Nix users:
+   nix build .#dagster  # Error shows GitHub hash
+   # Update hash, build again for PyPI hash
+
+   # For Flox users:
+   flox build  # Error shows GitHub hash
+   # Update hash, build again for PyPI hash
    ```
 
-2. **Update source reference**:
-   Edit `.flox/pkgs/dagster-src.nix`:
-   ```nix
-   rev = "abc123def456";  # Update this
-   hash = "";             # Clear the hash
-   ```
-
-3. **Get new hash**:
+3. **Test the build**:
    ```bash
-   flox build dagster-src
-   # Error message will show correct hash
-   # Copy it back into dagster-src.nix
+   # Nix:
+   nix run .#dagster -- --version
+
+   # Flox:
+   flox activate -- dagster --version
    ```
 
-4. **Build and test**:
-   ```bash
-   flox build
-   flox activate
-   python -c "import dagster; print(dagster.__version__)"
-   ```
+### Available Binaries
 
-5. **Publish updated packages**:
-   ```bash
-   git add .flox/
-   git commit -m "Update Dagster to abc123def456"
-   flox publish
-   ```
-
-### Pin to Specific Tag
-
-Edit `.flox/pkgs/dagster-src.nix`:
-```nix
-rev = "1.8.7";  # Or any tag/version
-hash = "";      # Will get from build error
-```
-
-Then follow steps 3-5 above.
+All versions provide these 8 binaries:
+- `dagster` - Main CLI
+- `dagster-daemon` - Background daemon
+- `dagster-webserver` - Web UI server
+- `dagster-webserver-debug` - Debug webserver
+- `dagster-graphql` - GraphQL API server
+- `dagster-init-config` - Configuration generator
+- `dagster-welcome` - Environment welcome message
+- `dagster-info` - Environment information
 
 ## Version Management
 
